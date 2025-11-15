@@ -1,0 +1,64 @@
+<script setup lang='ts'>
+import { LikeOutlined } from '@vicons/antd'
+import { AccessTimeRound, DrawOutlined } from '@vicons/material'
+import { coreModule, requireDepend, uni, Utils } from "delta-comic-core"
+import { StyleValue } from 'vue'
+const $props = defineProps<{
+  item: uni.item.Item
+  freeHeight?: boolean
+  disabled?: boolean
+  type?: "default" | "big" | "small"
+  class?: any
+  style?: StyleValue
+}>()
+const $emit = defineEmits<{
+  click: [item: uni.item.Item]
+}>()
+
+const { comp } = requireDepend(coreModule)
+</script>
+
+<template>
+  <comp.ItemCard :="$props" @click="$emit('click', item)">
+    <template #smallTopInfo>
+      <span>
+        <VanIcon name="eye-o" class="mr-0.5" size="14px" />
+        <span>{{ item.viewNumber }}</span>
+      </span>
+      <span>
+        <NIcon class="mr-0.5" size="14px" color="white">
+          <LikeOutlined />
+        </NIcon>
+        <span>{{ item.likeNumber }}</span>
+      </span>
+    </template>
+    <div class="flex gap-0.5 items-center" v-if="type == 'small'">
+      <NIcon color="var(--van-text-color-2)" size="14px">
+        <DrawOutlined />
+      </NIcon>
+      <span class="ml-0.5 text-xs van-ellipsis w-full text-(--van-text-color-2)">
+        {{ item.author[0].label }}
+        <template v-if="item.author.length > 1">
+          等联合创作
+        </template>
+      </span>
+    </div>
+    <template v-if="type != 'small'">
+      <div class="flex gap-0.5 **:text-nowrap">
+        <VanTag type="primary" plain v-for="category of item.categories">{{ category.name }}</VanTag>
+      </div>
+      <div class="flex flex-nowrap items-center *:text-nowrap van-ellipsis mt-0.5">
+        <NIcon color="var(--van-text-color-2)" size="14px">
+          <AccessTimeRound />
+        </NIcon>
+        <span class="mr-2">{{ Utils.translate.createDateString(item.$updateTime) }}</span>
+      </div>
+      <div class="flex flex-nowrap items-center *:text-nowrap van-ellipsis">
+        <NIcon color="var(--van-text-color-2)" size="14px">
+          <DrawOutlined />
+        </NIcon>
+        <span v-for="author of item.author" class="mr-2">{{ author.label }}</span>
+      </div>
+    </template>
+  </comp.ItemCArd>
+</template>
