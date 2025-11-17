@@ -4,11 +4,11 @@ import { pluginName } from "@/symbol"
 import dayjs from 'dayjs'
 import { EhPage } from "../page"
 import Dompurify from 'dompurify'
+import { _ehTranslate } from "../translate"
 
 export const createCommonToItem = async (tr: HTMLTableRowElement) => {
-  const bigCategory = <Category><any>Category[<any>tr.querySelector<HTMLDivElement>('.gl2e>div>a')?.innerText]
+  const bigCategory = <Category><any>Category[<any>tr.querySelector<HTMLDivElement>('.cn')?.innerText]
   const tagsTable = tr.querySelector<HTMLTableElement>('.gl2e>div>a table')!
-  console.log('tr:', tr, 'tagsTable:', tagsTable)
   const categories = await createCategories(tagsTable, bigCategory)
   const coverEl = tr.querySelector<HTMLImageElement>(' .gl1e img')!
   const id = new URL(tr.querySelector('a')?.href ?? '').pathname.replaceAll('/', '-')
@@ -24,7 +24,7 @@ export const createCommonToItem = async (tr: HTMLTableRowElement) => {
     id,
     thisEp: {
       $$plugin: pluginName,
-      index: '',
+      index: '1',
       name: ''
     },
     length: tr.querySelector<HTMLDivElement>('.gl3e:nth-child(5)')?.innerText.match(/\d+/)?.[0] ?? '',
@@ -32,7 +32,7 @@ export const createCommonToItem = async (tr: HTMLTableRowElement) => {
     cover: {
       $$plugin: pluginName,
       forkNamespace: 'ehgt',
-      path: new URL(coverEl.src).pathname,
+      path: coverEl.src,
       $$meta: {
         width: Number(coverEl.style.width.match(/\d+/)?.[0]),
         height: Number(coverEl.style.height.match(/\d+/)?.[0]),
@@ -57,42 +57,48 @@ const RateMap: Record<string, number> = {
 }
 
 export const createCategories = (table: HTMLTableElement, bigCategory: Category): Promise<uni.item.Category[]> => {
+  if (!table) return Promise.resolve([])
   const trs = Array.from(table.querySelectorAll('tr'))
+  console.log('-------------create-categories-------------')
+  console.log(trs)
   return Promise.all(trs.flatMap(r => {
     let rawGroup = r.querySelector<HTMLTableCellElement>('td.tc')?.innerText ?? ''
     rawGroup = rawGroup.slice(0, -1)
-    // const translated = await eh.translate.db.group
-    const rawTags = Array.from(r.querySelectorAll<HTMLDivElement>('.gt.gtl'))
-    return rawTags.map(async div => (<uni.item.Category>{
-      group: rawGroup,
-      name: (await eh.translate.db.tags.get(div.innerText))!.translate,
-      search: {
-        keyword: `${rawGroup}:${div.innerText}`,
-        sort: '',
-        source: 'keyword'
-      }
-    })).concat([Promise.resolve({
+    // const translated = await _ehTranslate.db.group
+    const rawTags = Array.from(r.querySelectorAll<HTMLDivElement>('.gt,.gtl'))
+    console.log(rawGroup, rawTags)
+    return [Promise.resolve({
       group: '',
-      name: CategoriesTranslations[bigCategory],
+      name: CategoriesTranslations[bigCategory] ?? '1234',
       search: {
         keyword: `#${Category[bigCategory]}-${bigCategory}#`,
         sort: '',
         source: 'keyword'
       }
-    })])
+    }), ...rawTags.map(async div => (<uni.item.Category>{
+      group: rawGroup,
+      name: (await _ehTranslate.db.tags.get(div.innerText))?.translate ?? div.innerText,
+      search: {
+        keyword: `${rawGroup}:${div.innerText}`,
+        sort: '',
+        source: 'keyword'
+      }
+    }))]
   }))
 }
 export const createAuthors = (table: HTMLTableElement): Promise<uni.item.Author[]> => {
+  if (!table) return Promise.resolve([])
   const trs = Array.from(table.querySelectorAll('tr'))
   return Promise.all(trs.flatMap(r => {
     const _rawGroup = r.querySelector<HTMLTableCellElement>('td.tc')?.innerText ?? ''
-    const rawGroup = <eh.translate.EHTNamespaceName>_rawGroup.slice(0, -1)
-    const rawTags = Array.from(r.querySelectorAll<HTMLDivElement>('.gt.gtl'))
+    const rawGroup = <_ehTranslate.EHTNamespaceName>_rawGroup.slice(0, -1)
+    if (!(<_ehTranslate.EHTNamespaceName[]>['artist', 'cosplayer', 'group']).includes(rawGroup)) return []
+    const rawTags = Array.from(r.querySelectorAll<HTMLDivElement>('.gt,.gtl'))
     return rawTags.map(async div => (<uni.item.Author>{
       $$plugin: pluginName,
-      description: rawGroup == 'artist' ? '作者' : 'coser',
+      description: rawGroup == 'artist' ? '作者' : (rawGroup == 'group' ? '团队' : 'coser'),
       icon: rawGroup == 'artist' ? 'draw' : 'user',
-      label: (await eh.translate.db.tags.get(div.innerText))!.translate,
+      label: (await _ehTranslate.db.tags.get(div.innerText))?.translate ?? div.innerText,
       actions: ['search'],
       subscribe: 'tag'
     }))
@@ -141,7 +147,7 @@ export const createFullToItem = async (gm: Document, id: string, commentsCount: 
     id,
     thisEp: {
       $$plugin: pluginName,
-      index: '',
+      index: '1',
       name: ''
     },
     length: gm.querySelector<HTMLParagraphElement>('.gtb>.gpc')?.innerText.match(/\d+/)?.[0] ?? '',
@@ -149,7 +155,7 @@ export const createFullToItem = async (gm: Document, id: string, commentsCount: 
     cover: {
       $$plugin: pluginName,
       forkNamespace: 'ehgt',
-      path: new URL(coverEl.style.backgroundImage.slice(5, -2)).pathname,
+      path: coverEl.style.backgroundImage.slice(5, -2),
       $$meta: {
         width: Number(coverEl.style.width.match(/\d+/)?.[0]),
         height: Number(coverEl.style.height.match(/\d+/)?.[0]),

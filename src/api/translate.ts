@@ -77,7 +77,7 @@ export namespace _ehTranslate {
     constructor() {
       super('EhTranslateDB')
       this.version(1).stores({
-        translates: 'raw, group, translate',
+        tags: 'raw, group, translate',
         group: 'raw'
       })
     }
@@ -92,7 +92,7 @@ export namespace _ehTranslate {
     })
     const downloadUrl = repo.assets.find(v => v.name == 'db.text.json.gz')
     if (!downloadUrl) throw new Error('未找到资源')
-    return { downloadUrl: downloadUrl.browser_download_url, tag: repo.tag_name, isNew: version.value == repo.tag_name }
+    return { downloadUrl: downloadUrl.browser_download_url, tag: repo.tag_name, isNew: version.value != repo.tag_name }
   }
 
   export const downloadDatabase = () => Utils.message.createDownloadMessage('更新翻译数据库', async ({ createLoading, createProgress }) => {

@@ -14,7 +14,7 @@ const $props = defineProps<{
 const $emit = defineEmits<{
   click: [item: uni.item.Item]
 }>()
-
+console.log($props.item)
 const { comp } = requireDepend(coreModule)
 </script>
 
@@ -22,16 +22,16 @@ const { comp } = requireDepend(coreModule)
   <comp.ItemCard :="$props" @click="$emit('click', item)">
     <template #smallTopInfo>
       <span>
-        <VanIcon name="app-o" class="mr-0.5" size="14px" />
-        <span>{{ item.categories[0].name }}</span>
+        <VanIcon name="apps-o" class="mr-0.5" size="14px" />
+        <span>{{ item.categories[0]?.name }}</span>
       </span>
       <VanRate :modelValue="item.likeNumber ?? 3" readonly allow-half size="14px" color="var(--p-color)" />
     </template>
-    <div class="flex gap-0.5 items-center" v-if="type == 'small'">
+    <div class="flex gap-0.5 items-center" v-if="(type == 'small' && item.author[0])">
       <NIcon color="var(--van-text-color-2)" size="14px">
         <DrawOutlined />
       </NIcon>
-      <span class="ml-0.5 text-xs van-ellipsis w-full text-(--van-text-color-2)">
+      <span class="ml-0.5 text-xs van-ellipsis w-full text-(--van-text-color-2)" v-if="item.author[0]">
         {{ item.author[0].label }}
         <template v-if="item.author.length > 1">
           等联合创作

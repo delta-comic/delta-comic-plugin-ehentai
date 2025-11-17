@@ -32,13 +32,12 @@ export namespace _ehApiSearch {
     }
   })
   export const getRandomComic = PromiseContent.fromAsyncFunction((async (signal?: AbortSignal) => {
-    const table = new DOMParser().parseFromString(await ehStore.api.value!.get<string>('/', {
+    const body = new DOMParser().parseFromString(await ehStore.api.value!.get<string>('/', {
       signal, params: {
         next: `36${random(0, 5)}0${random(0, 999)}`
       }
-    }), 'text/html').querySelector<HTMLTableElement>('.itg.glte')!
-    console.log('table:', table)
-    const cards = Array.from(table.querySelectorAll<HTMLTableRowElement>('.itg.glte>tbody>tr') ?? [])
+    }), 'text/html').querySelector('body')!
+    const cards = Array.from(body.querySelectorAll<HTMLTableRowElement>('.itg.glte>tbody>tr:has(td.gl1e)') ?? [])
     console.log("cards:", cards)
     return await Promise.all(cards.map(c => createCommonToItem(c)))
   }))

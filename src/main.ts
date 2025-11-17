@@ -64,9 +64,6 @@ definePlugin({
       return ins.api.eh
     }, {
       withCredentials: true,
-      params: {
-        inline_set: 'dm_e'
-      }
     })
     Utils.eventBus.SharedFunction.define(signal => eh.api.search.getRandomComic(signal), pluginName, 'getRandomProvide')
   },
@@ -74,10 +71,14 @@ definePlugin({
     name: '更新翻译数据',
     async call(setDescription) {
       setDescription('检测更新...')
-      const { isNew } = await eh.translate.getIsUpdate()
-      if (isNew) {
-        setDescription('更新中')
-        await eh.translate.downloadDatabase()
+      try {
+        const { isNew } = await eh.translate.getIsUpdate()
+        if (isNew) {
+          setDescription('更新中')
+          await eh.translate.downloadDatabase()
+        }
+      } catch (error) {
+        console.warn(error)
       }
     },
   }],
