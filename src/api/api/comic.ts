@@ -10,14 +10,14 @@ export namespace _ehApiComic {
   const { PromiseContent } = Utils.data
 
   export const getComicInfo = PromiseContent.fromAsyncFunction(async (id: string, signal?: AbortSignal) => {
-    const html = new DOMParser().parseFromString(await ehStore.api.value!.get<string>(id.replaceAll('-', '/'), {
+    const html =await ehStore.api.value!.get(id.replaceAll('-', '/'), {
       params: {
         hc: 1,
         nw: "session"
       },
       // cookie nw=1
       signal
-    }), 'text/html')
+    })
     const comments = Array.from(html.querySelectorAll<HTMLDivElement>('#cdiv>.c1'))
     return {
       info: createFullToItem(html, id, comments.length),
