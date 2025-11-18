@@ -1,3 +1,4 @@
-export const initCookie = () => {
-  document.cookie = 'sl=dm_2; SameSite=None; Secure'
+export const initCookie = {
+  sl: 'dm_2',
+  ns: 'session'
 }

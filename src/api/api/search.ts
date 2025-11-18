@@ -11,14 +11,14 @@ export namespace _ehApiSearch {
     let isDone = false
     while (true) {
       if (isDone) return
-      const html = new DOMParser().parseFromString(await ehStore.api.value!.get<string>('/', {
+      const html = (await ehStore.api.value!.get('/', {
         params: {
           next: Number.isNaN(absolutePage) ? undefined : absolutePage,
           f_search: keyword ? encodeURIComponent(keyword) : undefined,
           f_cats: category
         },
         signal
-      }), 'text/html').querySelector('body')!
+      })).querySelector('body')!
       const cards = Array.from(html.querySelectorAll<HTMLTableRowElement>('.itg.glte>tbody>tr'))
       const nextHref = html.querySelector<HTMLAnchorElement>('#unext')?.href
       if (!nextHref) isDone = true
@@ -32,11 +32,11 @@ export namespace _ehApiSearch {
     }
   })
   export const getRandomComic = PromiseContent.fromAsyncFunction((async (signal?: AbortSignal) => {
-    const body = new DOMParser().parseFromString(await ehStore.api.value!.get<string>('/', {
+    const body = (await ehStore.api.value!.get('/', {
       signal, params: {
         next: `36${random(0, 5)}0${random(0, 999)}`
       }
-    }), 'text/html').querySelector('body')!
+    })).querySelector('body')!
     const cards = Array.from(body.querySelectorAll<HTMLTableRowElement>('.itg.glte>tbody>tr:has(td.gl1e)') ?? [])
     console.log("cards:", cards)
     return await Promise.all(cards.map(c => createCommonToItem(c)))

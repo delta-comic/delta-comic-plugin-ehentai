@@ -13,6 +13,8 @@ import Card from "./components/card.vue"
 import { UserOutlined } from "@vicons/antd"
 import { DrawOutlined, DriveFolderUploadOutlined } from "@vicons/material"
 import { eh } from "./api"
+import { IFrameRequester } from "./utils/htmlRequester"
+import { initCookie } from "./api/header"
 const { layout } = requireDepend(coreModule)
 const testAxios = axios.create({
   timeout: 10000,
@@ -59,11 +61,10 @@ definePlugin({
     }
   },
   onBooted: ins => {
-    ehStore.api.value = Utils.request.createAxios(() => {
-      if (!isString(ins.api?.eh)) throw new Error('api not resolved')
-      return ins.api.eh
-    }, {
-      withCredentials: true,
+    if (!isString(ins.api?.eh)) throw new Error('api not resolved')
+    ehStore.api.value = new IFrameRequester({
+      baseUrl: ins.api.eh,
+      cookie: initCookie
     })
     Utils.eventBus.SharedFunction.define(signal => eh.api.search.getRandomComic(signal), pluginName, 'getRandomProvide')
   },
