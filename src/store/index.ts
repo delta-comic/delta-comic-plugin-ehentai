@@ -1,7 +1,7 @@
 import { shallowRef } from "vue"
-import type { IFrameRequester } from "@/utils/htmlRequester"
+import type { Utils } from "delta-comic-core"
 export namespace ehStore {
   
   export const loginToken = shallowRef('')
-  export const api = shallowRef<IFrameRequester>()
+  export const api = shallowRef<Utils.request.Requester>()
 }

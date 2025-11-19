@@ -11,7 +11,7 @@ export namespace _ehApiSearch {
     let isDone = false
     while (true) {
       if (isDone) return
-      const html = (await ehStore.api.value!.get('/', {
+      const html = (await ehStore.api.value!.get<Document>('/', {
         params: {
           next: Number.isNaN(absolutePage) ? undefined : absolutePage,
           f_search: keyword ? encodeURIComponent(keyword) : undefined,
@@ -32,7 +32,7 @@ export namespace _ehApiSearch {
     }
   })
   export const getRandomComic = PromiseContent.fromAsyncFunction((async (signal?: AbortSignal) => {
-    const body = (await ehStore.api.value!.get('/', {
+    const body = (await ehStore.api.value!.get<Document>('/', {
       signal, params: {
         next: `36${random(0, 5)}0${random(0, 999)}`
       }

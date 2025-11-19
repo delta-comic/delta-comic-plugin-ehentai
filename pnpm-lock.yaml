@@ -11,6 +11,9 @@ importers:
 
   .:
     dependencies:
+      '@capacitor/core':
+        specifier: ^7.4.4
+        version: 7.4.4
       '@octokit/rest':
         specifier: ^22.0.1
         version: 22.0.1
@@ -236,6 +239,9 @@ packages:
 
   '@bassist/utils@0.4.0':
     resolution: {integrity: sha512-aoFTl0jUjm8/tDZodP41wnEkvB+C5O9NFCuYN/ztL6jSUSsuBkXq90/1ifBm1XhV/zySHgLYlU1+tgo3XtQ+nA==}
+
+  '@capacitor/core@7.4.4':
+    resolution: {integrity: sha512-xzjxpr+d2zwTpCaN0k+C6wKSZzWFAb9OVEUtmO72ihjr/NEDoLvsGl4WLfjWPcCO2zOy0b2X52tfRWjECFUjtw==}
 
   '@css-render/plugin-bem@0.15.14':
     resolution: {integrity: sha512-QK513CJ7yEQxm/P3EwsI+d+ha8kSOcjGvD6SevM41neEMxdULE+18iuQK6tEChAWMOQNQPLG/Rw3Khb69r5neg==}
@@ -1920,6 +1926,10 @@ snapshots:
     dependencies:
       '@withtypes/mime': 0.1.2
 
+  '@capacitor/core@7.4.4':
+    dependencies:
+      tslib: 2.8.1
+
   '@css-render/plugin-bem@0.15.14(css-render@0.15.14)':
     dependencies:
       css-render: 0.15.14
@@ -3158,8 +3168,7 @@ snapshots:
 
   treemate@0.3.11: {}
 
-  tslib@2.8.1:
-    optional: true
+  tslib@2.8.1: {}
 
   typescript@5.9.3: {}
 

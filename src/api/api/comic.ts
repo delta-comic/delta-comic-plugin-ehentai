@@ -10,7 +10,7 @@ export namespace _ehApiComic {
   const { PromiseContent } = Utils.data
 
   export const getComicInfo = PromiseContent.fromAsyncFunction(async (id: string, signal?: AbortSignal) => {
-    const html =await ehStore.api.value!.get(id.replaceAll('-', '/'), {
+    const html =await ehStore.api.value!.get<Document>(id.replaceAll('-', '/'), {
       params: {
         hc: 1,
         nw: "session"

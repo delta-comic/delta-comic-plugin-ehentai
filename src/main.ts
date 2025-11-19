@@ -13,8 +13,8 @@ import Card from "./components/card.vue"
 import { UserOutlined } from "@vicons/antd"
 import { DrawOutlined, DriveFolderUploadOutlined } from "@vicons/material"
 import { eh } from "./api"
-import { IFrameRequester } from "./utils/htmlRequester"
 import { initCookie } from "./api/header"
+import { mainHost } from "./api/fork"
 const { layout } = requireDepend(coreModule)
 const testAxios = axios.create({
   timeout: 10000,
@@ -39,10 +39,7 @@ definePlugin({
   },
   api: {
     eh: {
-      forks: () => [
-        'https://e-hentai.org',
-        'https://exhentai.org'
-      ],
+      forks: () => mainHost,
       test: (fork, signal) => testAxios.get(fork, { signal })
     }
   },
@@ -60,12 +57,10 @@ definePlugin({
       uploader: DriveFolderUploadOutlined
     }
   },
-  onBooted: ins => {
+  onBooted: async ins => {
     if (!isString(ins.api?.eh)) throw new Error('api not resolved')
-    ehStore.api.value = new IFrameRequester({
-      baseUrl: ins.api.eh,
-      cookie: initCookie
-    })
+    await initCookie()
+    ehStore.api.value = Utils.request.createAxios(() => ins.api!.eh!.toString()!)
     Utils.eventBus.SharedFunction.define(signal => eh.api.search.getRandomComic(signal), pluginName, 'getRandomProvide')
   },
   otherProgress: [{
