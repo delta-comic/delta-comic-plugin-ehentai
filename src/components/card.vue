@@ -14,7 +14,7 @@ const $props = defineProps<{
 const $emit = defineEmits<{
   click: [item: uni.item.Item]
 }>()
-console.log($props.item)
+
 const { comp } = requireDepend(coreModule)
 </script>
 

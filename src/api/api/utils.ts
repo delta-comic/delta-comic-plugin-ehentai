@@ -56,53 +56,48 @@ const RateMap: Record<string, number> = {
   '0px -1px': 5,
 }
 
-export const createCategories = (table: HTMLTableElement, bigCategory: Category): Promise<uni.item.Category[]> => {
+export const createCategories = async (table: HTMLTableElement, bigCategory: Category): Promise<uni.item.Category[]> => {
   if (!table) return Promise.resolve([])
   const trs = Array.from(table.querySelectorAll('tr'))
-  console.log('-------------create-categories-------------')
-  console.log(trs)
-  return Promise.all(trs.flatMap(r => {
-    let rawGroup = r.querySelector<HTMLTableCellElement>('td.tc')?.innerText ?? ''
-    rawGroup = rawGroup.slice(0, -1)
-    // const translated = await _ehTranslate.db.group
-    const rawTags = Array.from(r.querySelectorAll<HTMLDivElement>('.gt,.gtl'))
-    console.log(rawGroup, rawTags)
-    return [Promise.resolve({
-      group: '',
-      name: CategoriesTranslations[bigCategory] ?? '1234',
-      search: {
-        keyword: `#${Category[bigCategory]}-${bigCategory}#`,
-        sort: '',
-        source: 'keyword'
+  const tags = [{
+    group: '',
+    name: CategoriesTranslations[bigCategory] ?? '<BigCategory>',
+    search: {
+      keyword: `#${Category[bigCategory]}-${bigCategory}#`,
+      sort: '',
+      source: 'keyword'
+    }
+  }, ... await Promise.all(trs.flat().flatMap(r => {
+    const tagEls = Array.from(r.querySelectorAll<HTMLDivElement>('.gt,.gtl'))
+    return tagEls.map(async div => {
+      if (!div.title) var [group, key] = div.id.slice(3).split(':')
+      else var [group, key] = div.title.split(':')
+      const category: uni.item.Category = {
+        group: (await _ehTranslate.db.tags.get(group))?.translate ?? group,
+        name: (await _ehTranslate.db.tags.get(key.replaceAll('_', ' ')))?.translate ?? key.replaceAll('_', ' '),
+        search: {
+          keyword: div.title,
+          sort: '',
+          source: 'keyword'
+        },
       }
-    }), ...rawTags.map(async div => (<uni.item.Category>{
-      group: rawGroup,
-      name: (await _ehTranslate.db.tags.get(div.innerText))?.translate ?? div.innerText,
-      search: {
-        keyword: `${rawGroup}:${div.innerText}`,
-        sort: '',
-        source: 'keyword'
-      }
-    }))]
-  }))
+      return category
+    })
+  }))]
+  return tags
 }
-export const createAuthors = (table: HTMLTableElement): Promise<uni.item.Author[]> => {
-  if (!table) return Promise.resolve([])
-  const trs = Array.from(table.querySelectorAll('tr'))
-  return Promise.all(trs.flatMap(r => {
-    const _rawGroup = r.querySelector<HTMLTableCellElement>('td.tc')?.innerText ?? ''
-    const rawGroup = <_ehTranslate.EHTNamespaceName>_rawGroup.slice(0, -1)
-    if (!(<_ehTranslate.EHTNamespaceName[]>['artist', 'cosplayer', 'group']).includes(rawGroup)) return []
-    const rawTags = Array.from(r.querySelectorAll<HTMLDivElement>('.gt,.gtl'))
-    return rawTags.map(async div => (<uni.item.Author>{
-      $$plugin: pluginName,
-      description: rawGroup == 'artist' ? '作者' : (rawGroup == 'group' ? '团队' : 'coser'),
-      icon: rawGroup == 'artist' ? 'draw' : 'user',
-      label: (await _ehTranslate.db.tags.get(div.innerText))?.translate ?? div.innerText,
-      actions: ['search'],
-      subscribe: 'tag'
-    }))
-  }))
+export const createAuthors = async (table: HTMLTableElement): Promise<uni.item.Author[]> => {
+  const categories = await createCategories(table, Category.Cosplay)
+  const rawAuthors = categories.filter(c => (<_ehTranslate.EHTNamespaceName[]>['artist', 'cosplayer', 'group'])
+    .some(v => c.search.keyword.startsWith(v)))
+  return Promise.all(rawAuthors.map(async cate => (<uni.item.Author>{
+    $$plugin: pluginName,
+    description: cate.search.keyword.startsWith('artist') ? '作者' : (cate.search.keyword.startsWith('group') ? '团队' : 'coser'),
+    icon: cate.search.keyword.startsWith('artist') ? 'draw' : 'user',
+    label: (await _ehTranslate.db.tags.get(cate.name))?.translate ?? cate.name,
+    actions: ['search'],
+    subscribe: 'tag'
+  })))
 }
 export enum Category {
   Misc = 1,

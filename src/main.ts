@@ -60,7 +60,10 @@ definePlugin({
   onBooted: async ins => {
     if (!isString(ins.api?.eh)) throw new Error('api not resolved')
     await initCookie()
-    ehStore.api.value = Utils.request.createAxios(() => ins.api!.eh!.toString()!)
+    ehStore.api.value = Utils.request.createAxios(() => ins.api!.eh!.toString()!, {
+      withCredentials: true,
+      responseType: 'document'
+    })
     Utils.eventBus.SharedFunction.define(signal => eh.api.search.getRandomComic(signal), pluginName, 'getRandomProvide')
   },
   otherProgress: [{
