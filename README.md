@@ -1,4 +1,4 @@
-# Delta Comic Plugin Bika - _<span style="font-weight: lighter;font-size:16px">何以战栗</span>_
+# Delta Comic Plugin EHentai - _<span style="font-weight: lighter;font-size:16px">何以战栗</span>_
 
 [![GitHub](https://img.shields.io/github/license/wenxig/delta-comic-plugin-ehentai)](https://raw.githubusercontent.com/wenxig/delta-comic-plugin-ehentai/main/LICENSE)
 
