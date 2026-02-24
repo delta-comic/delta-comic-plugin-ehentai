@@ -14,13 +14,13 @@
   "license": "AGPL-3.0-only",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview",
-    "lint": "oxlint --type-aware",
-    "lint:fix": "oxlint --fix --type-aware",
+    "dev": "bun --bun vite",
+    "build": "bun --bun vite build",
+    "preview": "bun --bun vite preview",
+    "lint": "bun --bun oxlint --type-aware",
+    "lint:fix": "bun --bun oxlint --fix --type-aware",
     "prepare": "husky",
-    "lint-staged": "lint-staged",
+    "lint-staged": "bun --bun exec lint-staged",
     "typecheck": "vue-tsc --noEmit -p ./tsconfig.json --composite false"
   },
   "dependencies": {
@@ -90,9 +90,6 @@
     "vue-tsc": "^3.1.1"
   },
   "pnpm": {
-    "overrides": {
-      "vite": "^8.0.0-beta.15"
-    },
     "onlyBuiltDependencies": [
       "@parcel/watcher",
       "@tailwindcss/oxide",
@@ -100,5 +97,8 @@
       "esbuild",
       "delta-comic-plugin-layout"
     ]
+  },
+  "overrides": {
+    "vite": "^8.0.0-beta.15"
   }
 }

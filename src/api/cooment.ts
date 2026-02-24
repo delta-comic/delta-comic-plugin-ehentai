@@ -1,6 +1,5 @@
 import { pluginName } from "@/symbol"
-import { uni, Utils } from "delta-comic-core"
-
+import { Stream, uni } from "@delta-comic/model"
 export namespace _ehComment {
   export class Comment extends uni.comment.Comment {
     public override sender: uni.user.User
@@ -13,7 +12,7 @@ export namespace _ehComment {
     public override sendComment(_text: string, _signal?: AbortSignal): PromiseLike<any> {
       throw new Error("Method not implemented.")
     }
-    public override children = Utils.data.Stream.create<never>(async function* () { })
+    public override children = Stream.create<never>(async function* () { })
 
     constructor(v: uni.comment.RawComment) {
       super(v)

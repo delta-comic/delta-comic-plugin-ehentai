@@ -1,11 +1,10 @@
 import { ehStore } from "@/store"
-import { Utils } from "delta-comic-core"
 import { createCommonToItem } from "./utils"
 import type { eh } from ".."
 import { random } from "es-toolkit/compat"
+import { PromiseContent, Stream } from "@delta-comic/model"
 
 export namespace _ehApiSearch {
-  const { Stream, PromiseContent } = Utils.data
   export const createSearchStream = (category?: string[], keyword?: string) => Stream.create<eh.comic.EhItem>(async function* (signal, that) {
     let absolutePage = NaN
     let isDone = false

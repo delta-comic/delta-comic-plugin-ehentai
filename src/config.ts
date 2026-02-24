@@ -1,5 +1,5 @@
-import { Store } from 'delta-comic-core'
-import { pluginName } from './symbol'
-export const config = new Store.ConfigPointer(pluginName, {
+import { ConfigPointer } from '@delta-comic/plugin'
 
-})
+import { pluginName } from './symbol'
+
+export const config = new ConfigPointer(pluginName, {}, 'E-Hentai')
