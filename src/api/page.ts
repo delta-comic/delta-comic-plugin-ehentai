@@ -1,40 +1,44 @@
-import { pluginName } from "@/symbol"
-import { coreModule, requireDepend, uni, Utils } from "delta-comic-core"
-import { eh } from "."
+import { Stream, uni, type RStream } from '@delta-comic/model'
+import { require } from '@delta-comic/plugin'
 
-const { view } = requireDepend(coreModule)
+import { pluginName, LayoutPlugin } from '@/symbol'
 
-export class EhPage extends uni.content.ContentImagePage {
-  override comments: Utils.data.RStream<uni.comment.Comment> =
-    Utils.data.Stream.create<uni.comment.Comment>(async function* () {
+import { eh } from '.'
+
+const { view, model } = require(LayoutPlugin)
+
+export class EhPage extends model.ContentImagePage {
+  override comments: RStream<uni.comment.Comment> = Stream.create<uni.comment.Comment>(
+    async function* () {
+      yield []
       return
-    })
-  public static contentType = this.toContentTypeString({
-    plugin: pluginName,
-    name: 'comic'
-  })
-  override contentType = uni.content.ContentPage.toContentType(EhPage.contentType)
+    }
+  )
+  public static contentType = uni.content.ContentPage.contentPage.toString([pluginName, 'comic'])
+  override contentType = uni.content.ContentPage.contentPage.toJSON(EhPage.contentType)
   override loadAll(signal?: AbortSignal) {
     this.pid.resolve(this.id)
-    return this.detail.content.loadPromise(eh.api.comic.getComicInfo(this.id, signal).then(info => {
-      this.comments = Utils.data.Stream.create<uni.comment.Comment>(async function* () {
-        yield info.comment
-        return
+    return this.detail.content.loadPromise(
+      eh.api.comic.getComicInfo(this.id, signal).then(info => {
+        this.comments = Stream.create<uni.comment.Comment>(async function* () {
+          yield info.comment
+          return
+        })
+        return info.info
       })
-      return info.info
-    }))
+    )
   }
   override reloadAll(_signal?: AbortSignal): Promise<any> {
-    throw new Error("Method not implemented.")
+    throw new Error('Method not implemented.')
   }
   override plugin = pluginName
   override loadAllOffline(): Promise<any> {
-    throw new Error("Method not implemented.")
+    throw new Error('Method not implemented.')
   }
-  override exportOffline(_save: any): Promise<any> {
-    throw new Error("Method not implemented.")
+  override exportOffline(): Promise<any> {
+    throw new Error('Method not implemented.')
   }
-  override ViewComp = view.Images
+  override ViewComp = view.Image as uni.content.ViewComp
   constructor(preload: uni.content.PreloadValue, id: string, ep: string) {
     super(preload, id, ep)
   }
