@@ -1,6 +1,6 @@
 import Database from '@tauri-apps/plugin-sql'
 import { debounce } from 'es-toolkit'
-import { CamelCasePlugin, Kysely, Migrator, type Migration, type SelectQueryBuilder } from 'kysely'
+import { CamelCasePlugin, Kysely, Migrator, type Migration } from 'kysely'
 import { TauriSqliteDialect } from 'kysely-dialect-tauri'
 import { SerializePlugin } from 'kysely-plugin-serialize'
 import mitt from 'mitt'

@@ -36,11 +36,11 @@
     "@tauri-apps/plugin-sql": "^2.3.2",
     "@vicons/antd": "^0.13.0",
     "@vicons/material": "^0.13.0",
-    "@vueuse/core": "^14.0.0",
+    "@vueuse/core": "^14.2.1",
     "axios": "^1.13.5",
     "crypto-js": "^4.2.0",
     "dayjs": "^1.11.19",
-    "dompurify": "^3.3.0",
+    "dompurify": "^3.3.1",
     "es-toolkit": "^1.44.0",
     "kysely": "^0.28.11",
     "kysely-dialect-tauri": "^1.2.1",
@@ -49,6 +49,7 @@
     "naive-ui": "^2.43.2",
     "pako": "^2.1.0",
     "vant": "^4.9.22",
+    "tauri-plugin-better-cors-fetch": "github:delta-comic/tauri-plugin-better-cors-fetch",
     "vue": "^3.5.29",
     "vue-picture-cropper": "^1.0.0",
     "vue-router": "^5.0.3"
@@ -78,7 +79,7 @@
     "lint-staged": "^16.2.7",
     "oxfmt": "^0.35.0",
     "oxlint": "^1.50.0",
-    "oxlint-tsgolint": "^0.14.2",
+    "oxlint-tsgolint": "^0.15.0",
     "semantic-release": "^25.0.3",
     "tailwindcss": "4.2.1",
     "typescript": "^5.9.3",
@@ -87,7 +88,7 @@
     "vite-plugin-externals": "^0.6.2",
     "vite-plugin-monkey": "^7.1.9",
     "vue-component-type-helpers": "^3.2.5",
-    "vue-tsc": "^3.1.1"
+    "vue-tsc": "^3.2.5"
   },
   "pnpm": {
     "onlyBuiltDependencies": [

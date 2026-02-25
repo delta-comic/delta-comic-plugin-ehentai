@@ -28,9 +28,9 @@ export default defineConfig(
         tailwindcss(),
         deltaComic(
           {
-            name: 'bika',
-            displayName: '哔咔漫画',
-            supportCoreVersion: '^1',
+            name: 'ehentai',
+            displayName: 'E-Hentai',
+            supportCoreVersion: '^1.2',
             version: _package.version,
             author: _package.author.name,
             description: _package.description,

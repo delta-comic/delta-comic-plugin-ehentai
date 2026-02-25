@@ -15,6 +15,7 @@ import { initCookie } from './api/header'
 import { EhPage } from './api/page'
 import Card from './components/card.vue'
 import { config } from './config'
+import { TranslateDB } from './db'
 import { ehStore } from './store'
 import { LayoutPlugin, pluginName } from './symbol'
 const { layout } = require(LayoutPlugin)
@@ -47,7 +48,8 @@ definePlugin({
     await initCookie()
     ehStore.api.value = createAxios(() => ins.api!.eh!.toString()!, {
       withCredentials: true,
-      responseType: 'document'
+      responseType: 'document',
+      headers: {}
     })
     SharedFunction.define(
       signal => eh.api.search.getRandomComic(signal),
@@ -61,10 +63,10 @@ definePlugin({
       async call(setDescription) {
         setDescription('检测更新...')
         try {
-          const { isNew } = await eh.translate.getIsUpdate()
+          const { isNew } = await TranslateDB.getIsUpdate()
           if (isNew) {
             setDescription('更新中')
-            await eh.translate.downloadDatabase()
+            await TranslateDB.downloadDatabase()
           }
         } catch (error) {
           console.warn(error)
