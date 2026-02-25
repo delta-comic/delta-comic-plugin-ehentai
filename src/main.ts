@@ -46,11 +46,20 @@ definePlugin({
   onBooted: async ins => {
     if (!isString(ins.api?.eh)) throw new Error('api not resolved')
     await initCookie()
-    ehStore.api.value = createAxios(() => ins.api!.eh!.toString()!, {
-      withCredentials: true,
-      responseType: 'document',
-      headers: {}
-    })
+    ehStore.api.value = createAxios(
+      () => ins.api!.eh!.toString()!,
+      { withCredentials: true, responseType: 'document' },
+      axios => {
+        axios.interceptors.response.use(res => {
+          if (!isString(res.data)) return res
+          if (res.config.responseType != 'document') return res
+          const parser = new DOMParser()
+          console.debug('eh request', res.data)
+          return { ...res, data: parser.parseFromString(res.data, 'text/html') }
+        })
+        return axios
+      }
+    )
     SharedFunction.define(
       signal => eh.api.search.getRandomComic(signal),
       pluginName,
