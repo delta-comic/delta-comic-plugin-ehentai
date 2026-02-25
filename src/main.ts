@@ -12,7 +12,6 @@ import { eh } from './api'
 import './api'
 import { mainHost } from './api/fork'
 import { initCookie } from './api/header'
-import { EhPage } from './api/page'
 import Card from './components/card.vue'
 import { config } from './config'
 import { TranslateDB } from './db'
@@ -31,15 +30,36 @@ testAxios.interceptors.response.use(undefined, interceptors.createAutoRetry(test
 definePlugin({
   name: pluginName,
   content: {
-    [EhPage.contentType]: {
+    [eh.page.EhPage.contentType]: {
       itemCard: Card,
-      contentPage: EhPage,
+      contentPage: eh.page.EhPage,
       itemTranslator: v => eh.comic.EhItem.create(v),
       layout: layout.Default
     }
   },
   api: { eh: { forks: () => mainHost, test: (fork, signal) => testAxios.get(fork, { signal }) } },
-  image: { forks: { ehgt: ['https://ehgt.org'], hath: ['https://hath.network'] }, test: '' },
+  resource: {
+    types: [
+      {
+        type: 'ehgt',
+        urls: ['https://ehgt.org'],
+        test: async (url, signal) => {
+          return
+          const body = await fetch(url + '/g/t.png', { signal })
+          if (!body.ok) throw new Error('fail to connect')
+        }
+      },
+      {
+        type: 'hath',
+        urls: ['http://hath.network'],
+        test: async (url, signal) => {
+          const body = await fetch(url, { signal })
+          if (!body.ok) throw new Error('fail to connect')
+        }
+      }
+    ],
+    process: { getImage: eh.image.getImage }
+  },
   user: {
     authorIcon: { coser: UserOutlined, draw: DrawOutlined, uploader: DriveFolderUploadOutlined }
   },
@@ -50,13 +70,13 @@ definePlugin({
       () => ins.api!.eh!.toString()!,
       { withCredentials: true, responseType: 'document' },
       axios => {
-        axios.interceptors.response.use(res => {
-          if (!isString(res.data)) return res
-          if (res.config.responseType != 'document') return res
-          const parser = new DOMParser()
-          console.debug('eh request', res.data)
-          return { ...res, data: parser.parseFromString(res.data, 'text/html') }
-        })
+        // axios.interceptors.response.use(res => {
+        //   if (!isString(res.data)) return res
+        //   if (res.config.responseType != 'document') return res
+        //   const parser = new DOMParser()
+        //   console.debug('eh request', res.data)
+        //   return { ...res, data: parser.parseFromString(res.data, 'text/html') }
+        // })
         return axios
       }
     )
@@ -71,15 +91,18 @@ definePlugin({
       name: '更新翻译数据',
       async call(setDescription) {
         setDescription('检测更新...')
-        try {
-          const { isNew } = await TranslateDB.getIsUpdate()
-          if (isNew) {
-            setDescription('更新中')
-            await TranslateDB.downloadDatabase()
+        const updating = (async () => {
+          try {
+            const { isNew } = await TranslateDB.getIsUpdate()
+            if (isNew) {
+              setDescription('更新中')
+              await TranslateDB.downloadDatabase()
+            }
+          } catch (error) {
+            console.warn(error)
           }
-        } catch (error) {
-          console.warn(error)
-        }
+        })()
+        if (TranslateDB.checkIsEmpty()) await updating
       }
     }
   ],

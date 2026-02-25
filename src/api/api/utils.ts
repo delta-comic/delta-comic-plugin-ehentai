@@ -6,7 +6,6 @@ import { db, type TranslateDB } from '@/db'
 import { pluginName } from '@/symbol'
 
 import { eh } from '..'
-import { EhPage } from '../page'
 
 export const createCommonToItem = async (tr: HTMLTableRowElement) => {
   const bigCategory = tr.querySelector<HTMLDivElement>('.cn')?.innerText as Category
@@ -22,7 +21,7 @@ export const createCommonToItem = async (tr: HTMLTableRowElement) => {
     author: await createAuthors(tr.querySelector<HTMLTableElement>('& table')!),
     title: tr.querySelector<HTMLDivElement>('div.glink')?.innerText ?? '',
     commentSendable: true,
-    contentType: EhPage.contentType,
+    contentType: eh.page.EhPage.contentType,
     epLength: '1',
     id,
     thisEp: { $$plugin: pluginName, index: '1', name: '' },
@@ -201,7 +200,7 @@ export const createFullToItem = async (gm: Document, id: string, commentsCount: 
     author: await createAuthors(gm.querySelector<HTMLTableElement>('#taglist>table')!),
     title: gm.querySelector<HTMLHRElement>('#gn')?.innerText ?? '',
     commentSendable: true,
-    contentType: EhPage.contentType,
+    contentType: eh.page.EhPage.contentType,
     epLength: '1',
     id,
     thisEp: { $$plugin: pluginName, index: '1', name: '' },

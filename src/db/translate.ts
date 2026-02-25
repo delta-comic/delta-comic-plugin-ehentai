@@ -97,6 +97,9 @@ export const useOctokit = () => {
 }
 
 const version = useNativeStore(pluginName, 'translate_version', { tag: '' })
+
+export const checkIsEmpty = () => version.value.tag == ''
+
 export const getIsUpdate = async () => {
   const octokit = useOctokit()
   const { data: repo } = await octokit.rest.repos.getLatestRelease({
