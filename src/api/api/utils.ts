@@ -2,7 +2,7 @@ import type { uni } from '@delta-comic/model'
 import dayjs from 'dayjs'
 import Dompurify from 'dompurify'
 
-import { db, type TranslateDB } from '@/db'
+import { TranslateDB } from '@/db'
 import { pluginName } from '@/symbol'
 
 import { eh } from '..'
@@ -79,27 +79,12 @@ export const createCategories = async (
       trs.flat().flatMap(r => {
         const tagEls = Array.from(r.querySelectorAll<HTMLDivElement>('.gt,.gtl'))
         return tagEls.map(async div => {
-          if (!div.title) var [group, key] = div.id.slice(3).split(':')
-          else var [group, key] = div.title.split(':')
-          const tagName = key.replaceAll('_', ' ').split(':')
+          if (!div.title) var [group, key] = TranslateDB.tagTranslateCache.toJSON(div.id.slice(3))
+          else var [group, key] = TranslateDB.tagTranslateCache.toJSON(div.title)
+
           const category: uni.item.Category = {
-            group:
-              (
-                await db.value
-                  .selectFrom('translate_group')
-                  .where('raw', '=', group)
-                  .select('translate')
-                  .executeTakeFirst()
-              )?.translate ?? group,
-            name:
-              (
-                await db.value
-                  .selectFrom('translate_key')
-                  .where('group', '=', tagName[0])
-                  .where('raw', '=', tagName[1])
-                  .select('translate')
-                  .executeTakeFirst()
-              )?.translate ?? key.replaceAll('_', ' '),
+            group: await TranslateDB.getGroupTranslation(group),
+            name: await TranslateDB.getTagTranslation(group, key),
             search: { keyword: div.title, sort: '', source: 'keyword' }
           }
           return category
@@ -127,18 +112,11 @@ export const createAuthors = async (table: HTMLTableElement): Promise<uni.item.A
               ? '团队'
               : 'coser',
           icon: cate.search.keyword.startsWith('artist') ? 'draw' : 'user',
-          label:
-            (
-              await (async () => {
-                const [group, raw] = cate.name.replaceAll('_', ' ').split(':')
-                return await db.value
-                  .selectFrom('translate_key')
-                  .where('group', '=', group)
-                  .where('raw', '=', raw)
-                  .select('translate')
-                  .executeTakeFirst()
-              })()
-            )?.translate ?? cate.name,
+          label: await (async () => {
+            return await TranslateDB.getTagTranslation(
+              ...TranslateDB.tagTranslateCache.toJSON(cate.name)
+            )
+          })(),
           actions: ['search'],
           subscribe: 'tag'
         }

@@ -1,1 +1,1 @@
-export const mainHost = ['https://e-hentai.org', 'https://exhentai.org']
+export const mainHost = ['https://e-hentai.org'] //, 'https://exhentai.org']

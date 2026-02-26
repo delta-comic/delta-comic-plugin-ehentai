@@ -70,13 +70,13 @@ definePlugin({
       () => ins.api!.eh!.toString()!,
       { withCredentials: true, responseType: 'document' },
       axios => {
-        // axios.interceptors.response.use(res => {
-        //   if (!isString(res.data)) return res
-        //   if (res.config.responseType != 'document') return res
-        //   const parser = new DOMParser()
-        //   console.debug('eh request', res.data)
-        //   return { ...res, data: parser.parseFromString(res.data, 'text/html') }
-        // })
+        axios.interceptors.response.use(res => {
+          if (!isString(res.data)) return res
+          if (res.config.responseType != 'document') return res
+          const parser = new DOMParser()
+          // console.debug('eh request', res.config.url, res.data, res)
+          return { ...res, data: parser.parseFromString(res.data, 'text/html') }
+        })
         return axios
       }
     )
@@ -91,18 +91,15 @@ definePlugin({
       name: '更新翻译数据',
       async call(setDescription) {
         setDescription('检测更新...')
-        const updating = (async () => {
-          try {
-            const { isNew } = await TranslateDB.getIsUpdate()
-            if (isNew) {
-              setDescription('更新中')
-              await TranslateDB.downloadDatabase()
-            }
-          } catch (error) {
-            console.warn(error)
+        try {
+          const { isNew } = await TranslateDB.getIsUpdate()
+          if (isNew || (await TranslateDB.checkIsEmpty())) {
+            setDescription('更新中')
+            await TranslateDB.downloadDatabase()
           }
-        })()
-        if (TranslateDB.checkIsEmpty()) await updating
+        } catch (error) {
+          console.warn(error)
+        }
       }
     }
   ],

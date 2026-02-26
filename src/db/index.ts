@@ -15,7 +15,7 @@ import * as TranslateDB from './translate'
 export * as TranslateDB from './translate'
 
 export interface DB {
-  translate_key: TranslateDB.Tag.Table
+  translate_tag: TranslateDB.Tag.Table
   translate_group: TranslateDB.Group.Table
 }
 const database = await Database.load(`sqlite:eh.db`)
@@ -24,18 +24,18 @@ const emitter = mitt<{ onChange: void }>()
 
 const MUTATION_KEYWORDS = /\b(INSERT|UPDATE|DELETE|REPLACE|CREATE|DROP|ALTER)\b/i
 const triggerUpdate = debounce(() => {
-  console.debug('[db sync] db changed')
+  // console.debug('[db sync] db changed')
   emitter.emit('onChange')
   triggerRef(db)
 }, 300)
 
 export const db = await (async () => {
-  const db = shallowRef(
+  const db_ = shallowRef(
     new Kysely<DB>({
       dialect: new TauriSqliteDialect({
         database: {
-          close(db) {
-            return database.close(db)
+          close(db_) {
+            return database.close(db_)
           },
           path: database.path,
           async select<T>(query: string, bindValues?: unknown[]) {
@@ -56,7 +56,7 @@ export const db = await (async () => {
     })
   )
   const migrator = new Migrator({
-    db: db.value,
+    db: db_.value,
     provider: {
       async getMigrations() {
         return migrations
@@ -64,5 +64,7 @@ export const db = await (async () => {
     }
   })
   await migrator.migrateToLatest()
-  return db
+  return db_
 })()
+
+window.$api.ehDb = db

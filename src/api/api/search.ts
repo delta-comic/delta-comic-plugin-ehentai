@@ -1,4 +1,5 @@
 import { PromiseContent, Stream } from '@delta-comic/model'
+import { pad } from 'es-toolkit'
 import { random } from 'es-toolkit/compat'
 
 import { ehStore } from '@/store'
@@ -37,10 +38,21 @@ export namespace _ehApiSearch {
         yield await Promise.all(cards.map(c => createCommonToItem(c)))
       }
     })
+  let totalPages = NaN
   export const getRandomComic = PromiseContent.fromAsyncFunction(async (signal?: AbortSignal) => {
+    if (Number.isNaN(totalPages))
+      totalPages = Number(
+        (await ehStore.api.value!.get<Document>('/', { signal, responseType: 'document' }))
+          .querySelector<HTMLAnchorElement>('.itg.glte>tbody>tr:first-child a:nth-child(2)')
+          ?.href.split('/')[4]
+      )
+
+    const page = totalPages.toString()
     const res = await ehStore.api.value!.get<Document>('/', {
       signal,
-      params: { next: `36${random(0, 5)}0${random(0, 999)}` },
+      params: {
+        next: page.slice(0, -3) + pad(random(0, Number(page.slice(-3)), false).toString(), 3, '0')
+      },
       responseType: 'document'
     })
     console.log('random', res)
